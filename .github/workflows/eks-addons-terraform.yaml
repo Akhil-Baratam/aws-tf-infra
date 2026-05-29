@@ -1,0 +1,110 @@
+name: Terraform EKS-addons Pipeline
+
+on:
+  push:
+    branches:
+      - master
+      - terraform-iac
+    paths:
+      - 'terraform/eks-addons/**'
+      - '.github/workflows/eks-addons-terraform.yaml'
+
+  workflow_dispatch:
+    inputs:
+      apply:
+        description: 'Run terraform apply after plan'
+        type: boolean
+        default: false
+
+env:
+  TERRAFORM_DIR: terraform/eks-addons
+  TF_WORKSPACE: dev
+  TF_VAR_argo_repo_ssh_private_key: ${{ secrets.ARGO_REPO_SSH_PRIVATE_KEY }}
+
+jobs:
+  terraform-plan:
+    name: Terraform Plan
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    defaults:
+      run:
+        working-directory: ${{ env.TERRAFORM_DIR }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.6.6
+
+      - name: Terraform Init
+        run: terraform init -input=false
+
+      - name: Workspace
+        run: terraform workspace show
+
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Terraform Plan
+        run: |
+          terraform plan \
+            -input=false \
+            -lock-timeout=60s \
+            -var-file=tfvars/dev.tfvars \
+            -out=tfplan
+
+      - name: Upload Plan Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: terraform-plan-addons
+          path: ${{ env.TERRAFORM_DIR }}/tfplan
+
+  terraform-apply:
+    name: Terraform Apply
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    needs: terraform-plan
+    if: ${{ github.event.inputs.apply == 'true' }}
+
+    defaults:
+      run:
+        working-directory: ${{ env.TERRAFORM_DIR }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.6.6
+
+      - name: Terraform Init
+        run: terraform init -input=false
+
+      - name: Download Plan Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: terraform-plan-addons
+          path: ${{ env.TERRAFORM_DIR }}
+
+      - name: Terraform Apply
+        run: terraform apply -input=false -lock-timeout=60s tfplan
