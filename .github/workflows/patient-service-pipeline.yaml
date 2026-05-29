@@ -1,0 +1,124 @@
+name: Build patient service and Push to ECR
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'api/patient_service.go'
+      - 'api/Dockerfile'
+      - '.github/workflows/patient-service-pipeline.yaml'
+  
+  workflow_dispatch:
+
+permissions:
+  contents: write
+    
+
+env:
+  AWS_REGION: ${{ secrets.AWS_REGION }}
+  ECR_REPOSITORY: patient-service
+  APP_PATH: patient_service
+  PORT: 8001
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  HELM_VALUES_FILE_PATH: helm-charts/helm-chart-api/values-patient-service.yaml
+  FILE_NAME: patient-service
+
+  
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    outputs:
+      image-tag: ${{ steps.set-tag.outputs.tag }}
+
+    steps:
+
+      # Checkout repository
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Generate image tag
+      - name: Generate and set image tag
+        id: set-tag
+        run: |
+          BRANCH_NAME=$(echo "${GITHUB_REF##*/}" | tr '/' '-')
+          SHORT_SHA=$(echo "${GITHUB_SHA}" | cut -c1-8)
+          IMAGE_TAG="${BRANCH_NAME}-${SHORT_SHA}"
+
+          echo "branch=${BRANCH_NAME}" >> $GITHUB_OUTPUT
+          echo "sha=${SHORT_SHA}" >> $GITHUB_OUTPUT
+          echo "tag=${IMAGE_TAG}" >> $GITHUB_OUTPUT
+
+      # Configure AWS credentials
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ env.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      # Login to Amazon ECR
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      # Setup Docker Buildx
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # Build and push Docker image
+      - name: Build and Push Docker Image
+        run: |
+          docker buildx build \
+            --platform linux/amd64 \
+            --build-arg APP_PATH=${{ env.APP_PATH }} \
+            --build-arg PORT=${{ env.PORT }} \
+            -f api/Dockerfile \
+            -t ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ steps.set-tag.outputs.tag }} \
+            -t ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:latest \
+            --push \
+            api/
+  
+  update-helm:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Install yq
+        run: |
+          sudo wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/bin/yq
+          sudo chmod +x /usr/bin/yq
+
+      - name: Update Helm values file
+        run: |
+          TAG=${{ needs.build-and-push.outputs.image-tag }}
+
+          yq e '.image.tag = "'"$TAG"'"' -i ${{ env.HELM_VALUES_FILE_PATH }}
+
+      - name: Commit and push changes
+        run: |
+          TAG=${{ needs.build-and-push.outputs.image-tag }}
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add ${{ env.HELM_VALUES_FILE_PATH }}
+          git commit -m "Update image tag in ${{ env.FILE_NAME }} helm values" || echo "No changes"
+
+          for i in 1 2 3; do
+            git pull --rebase origin master && git push origin HEAD:master && break
+            echo "Push failed, retrying in 5 seconds..."
+            sleep 5
+          done
+
+
