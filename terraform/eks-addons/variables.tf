@@ -27,6 +27,26 @@ variable "k8s_namespaces" {
 
 
 
+# ─── AWS Load Balancer Controller ────────────────────────────────────────────
+
+variable "enable_lb_controller" {
+  type        = bool
+  default     = false
+  description = "Create the AWS Load balancer controller in the cluster"
+}
+
+variable "aws_lb_controller_chart_version" {
+  type        = string
+  default     = ""
+  description = "aws_lb_controller_chart_version"
+}
+
+variable "aws_load_balancer_controller_namespace" {
+  type        = string
+  default     = "lb-controller"
+  description = "Namespace for the AWS LB controller"
+}
+
 # ─── Cluster Autoscaler ─────────────────────────────────────────────────────
 
 variable "enable_cluster_autoscaler" {

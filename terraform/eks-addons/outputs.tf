@@ -23,3 +23,8 @@ output "cluster_oidc_provider_arn" {
   value       = local.eks_oidc_provider_arn
 }
 
+output "cluster_certificate_authority_data" {
+  value       = data.terraform_remote_state.eks.outputs.cluster_certificate_authority_data
+  sensitive   = true
+  description = "cluster_certificate_authority_data"
+}

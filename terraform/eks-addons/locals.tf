@@ -18,6 +18,9 @@ locals {
   # create ECR pull secrets in all app namespaces
   ecr_secret_namespaces = var.k8s_namespaces
 
+  # ALB root account ID for ap-south-1 (Mumbai)
+  # Full list -> https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-access-logs.html
+  alb_root_account_id = "718504428378"
 
   tags = {
     "ClusterName" = local.cluster_name
