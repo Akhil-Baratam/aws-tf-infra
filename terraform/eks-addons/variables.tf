@@ -26,3 +26,17 @@ variable "k8s_namespaces" {
 
 
 
+
+# ─── Cluster Autoscaler ─────────────────────────────────────────────────────
+
+variable "enable_cluster_autoscaler" {
+  type        = bool
+  default     = false
+  description = "enable_cluster_autoscaler"
+}
+
+variable "aws_cluster_autoscaler_chart_version" {
+  description = "helm chart version for cluster autoscaler"
+  type        = string
+  default     = "9.29.0"
+}

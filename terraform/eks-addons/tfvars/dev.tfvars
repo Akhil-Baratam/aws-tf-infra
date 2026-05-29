@@ -8,3 +8,6 @@ cluster_name        = "apex-dev"
 k8s_namespaces = ["dev", "ops"]
 
 
+# ─── Cluster Autoscaler ─────────────────────────────────────────────────────
+enable_cluster_autoscaler            = true
+aws_cluster_autoscaler_chart_version = "9.43.0"
