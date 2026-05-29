@@ -16,7 +16,30 @@ module "eks" {
   # Private-only endpoint would require a VPN/bastion to reach the cluster.
   endpoint_public_access = true
 
+  # Essential addons — without these, nodes cannot become Ready
+  addons = {
+    coredns = {}
+    eks-pod-identity-agent = {
+      before_compute = true
+    }
+    kube-proxy = {}
+    vpc-cni = {
+      before_compute = true
+    }
+  }
 
+  eks_managed_node_groups = {
+    apex-dev-01 = {
+      # Starting on 1.30, AL2023 is the default AMI type for EKS managed node groups
+      capacity_type  = "ON_DEMAND"
+      instance_types = var.node_instance_types
+      ami_type       = "AL2023_x86_64_STANDARD"
+
+      min_size     = var.node_min_size
+      max_size     = var.node_max_size
+      desired_size = var.node_desired_size
+    }
+  }
 
   tags = local.tags
 }
