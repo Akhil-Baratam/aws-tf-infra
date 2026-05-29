@@ -1,0 +1,24 @@
+name: insurance-service
+namespace: dev
+replicaCount: 1
+imagePullSecrets:
+  - name: ecr-secret
+image:
+  repository: 850995547887.dkr.ecr.ap-south-1.amazonaws.com/insurance-service
+  tag: master-707ec99b
+resources:
+  requests:
+    memory: "64Mi"
+    cpu: "10m"
+  limits:
+    memory: "128Mi"
+    cpu: "50m"
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 2
+  targetCPUUtilizationPercentage: 70
+service:
+  enabled: true
+  port: 80
+  targetPort: 8002

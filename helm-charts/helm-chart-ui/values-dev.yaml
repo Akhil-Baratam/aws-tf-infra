@@ -1,0 +1,24 @@
+name: hello-world
+namespace: dev
+replicaCount: 1
+imagePullSecrets:
+  - name: ecr-secret
+image:
+  repository: 850995547887.dkr.ecr.ap-south-1.amazonaws.com/ui
+  tag: master-180e2b54
+resources:
+  requests:
+    memory: "512Mi"
+    cpu: "200m"
+  limits:
+    memory: "1Gi"
+    cpu: "1000m"
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 2
+  targetCPUUtilizationPercentage: 70
+service:
+  enabled: true
+  port: 80
+  targetPort: 3000
