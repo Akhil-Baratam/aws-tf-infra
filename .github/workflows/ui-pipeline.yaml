@@ -20,7 +20,7 @@ env:
   APP_PATH: ui
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  HELM_VALUES_FILE_PATH: helm-charts/helm-chart-ui/values-staging.yaml
+  HELM_VALUES_FILE_PATH: helm-charts/helm-chart-ui/values-dev.yaml
 
   
 
