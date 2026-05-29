@@ -1,0 +1,46 @@
+services:
+
+  patient:
+    build:
+      context: ./api
+      args:
+        APP_PATH: patient_service
+    ports:
+      - "8001:8001"
+    container_name: patient_service
+    networks:
+      - healthcare_network
+
+  insurance:
+    build:
+      context: ./api
+      args:
+        APP_PATH: insurance_service
+    ports:
+      - "8002:8002"
+    container_name: insurance_service
+    networks:
+      - healthcare_network
+
+  pricing:
+    build:
+      context: ./api
+      args:
+        APP_PATH: pricing_service
+    ports:
+      - "8003:8003"
+    container_name: pricing_service
+    networks:
+      - healthcare_network
+
+  ui:
+    build: ./ui
+    ports:
+      - "3000:3000"
+    container_name: ui_service
+    networks:
+      - healthcare_network
+
+networks:
+  healthcare_network:
+    driver: bridge

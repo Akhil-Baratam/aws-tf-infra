@@ -1,0 +1,151 @@
+# =============================================================================
+# TERRAFORM
+# =============================================================================
+
+# Local .terraform directories (downloaded providers & modules)
+**/.terraform/
+**/.terraform.lock.hcl
+
+# Terraform state files — NEVER commit these (contain secrets)
+*.tfstate
+*.tfstate.*
+*.tfstate.backup
+
+# Terraform plan output files
+*.tfplan
+plan.txt
+plan.yml
+
+# Terraform variable files that may contain secrets
+# (tfvars/dev.tfvars, tfvars/prod.tfvars etc. are tracked since they are non-secret)
+*.auto.tfvars
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Terraform crash logs
+crash.log
+crash.*.log
+
+# =============================================================================
+# GO (API services)
+# =============================================================================
+
+# Compiled binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary & coverage output
+*.test
+*.out
+coverage.html
+
+# Go workspace file
+go.work
+go.work.sum
+
+# Vendor directory (if not vendoring)
+vendor/
+
+# =============================================================================
+# NODE / REACT (UI)
+# =============================================================================
+
+node_modules/
+.pnp
+.pnp.js
+
+# Build output
+ui/build/
+ui/dist/
+
+# Testing
+coverage/
+
+# npm / yarn debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# =============================================================================
+# ENVIRONMENT & SECRETS
+# =============================================================================
+
+# .env files — NEVER commit real secrets
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# AWS credentials / config
+.aws/
+aws-credentials
+
+# Kubeconfig files
+kubeconfig
+kubeconfig.*
+*.kubeconfig
+
+# =============================================================================
+# DOCKER
+# =============================================================================
+
+# Docker override files (local overrides)
+docker-compose.override.yml
+
+# =============================================================================
+# HELM
+# =============================================================================
+
+# Helm chart lock files (generated)
+Chart.lock
+
+# Helm packaged charts
+*.tgz
+
+# =============================================================================
+# EDITOR & OS
+# =============================================================================
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Linux
+*~
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# JetBrains IDEs (GoLand, WebStorm)
+.idea/
+*.iml
+*.iws
+
+# Vim
+*.swp
+*.swo
+
+# =============================================================================
+# MISC
+# =============================================================================
+
+# Logs
+logs/
+*.log
+
+# Temporary files
+tmp/
+temp/
