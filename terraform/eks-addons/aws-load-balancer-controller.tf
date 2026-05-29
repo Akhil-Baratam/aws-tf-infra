@@ -30,7 +30,7 @@ resource "kubernetes_service_account" "aws_load_balancer_controller" {
     name      = "aws-load-balancer-controller"
     namespace = var.aws_load_balancer_controller_namespace
     annotations = {
-      "eks.amazonaws.com/role-arn" = module.aws_lb_controller_service_account_role[0].iam_role_arn
+      "eks.amazonaws.com/role-arn" = module.aws_lb_controller_service_account_role[0].arn
     }
     labels = {
       "app.kubernetes.io/name"     = "aws-load-balancer-controller"

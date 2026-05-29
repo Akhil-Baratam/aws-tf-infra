@@ -49,7 +49,7 @@ Base consultation fee is **$800**. The pricing service applies:
 
 Insurance then covers 90% of the adjusted total. Patient pays the remaining 10%.
 
-**Example:** Patient in New York, PROMO2024 discount code
+**Example:** Patient in New York with PROMO2024 discount code
 - Base: $800
 - NY multiplier: × 1.30 = $1,040
 - 10% discount: − $104 = $936
@@ -79,7 +79,7 @@ go run pricing_service.go    # :8003
 
 ## Infrastructure
 
-Everything runs on AWS EKS in `ap-south-1`. Infrastructure is split into two Terraform modules so you can manage the cluster and addons independently.
+Everything runs on AWS EKS in `ap-south-1`. Infrastructure is split into two Terraform modules so the cluster and addons can be managed independently.
 
 ### eks module
 
@@ -109,7 +109,7 @@ Both modules use OIDC-based IAM roles (no static credentials on the cluster).
 
 ### Application Pipelines
 
-Four workflows in `.github/workflows/`, one per service. Each one is path-scoped — pushing `api/patient_service.go` only triggers the patient service pipeline.
+Four workflows in `.github/workflows/`, one per service. Each is path-scoped — pushing `api/patient_service.go` only triggers the patient service pipeline.
 
 **Job 1 — build-and-push:**
 1. Generates an image tag: `master-{first 8 chars of commit SHA}`
@@ -127,9 +127,9 @@ Four workflows in `.github/workflows/`, one per service. Each one is path-scoped
 Two workflows — one for `terraform/eks` and one for `terraform/eks-addons`.
 
 - **On push**: always runs `terraform plan` and uploads the plan as an artifact
-- **On manual trigger**: runs `apply` using the saved plan, but only if you explicitly set `apply: true` in the workflow dispatch inputs
+- **On manual trigger**: runs `apply` using the saved plan — only if you explicitly set `apply: true`
 
-This means infra changes never apply automatically — you always have to consciously trigger the apply.
+Infra changes never apply automatically.
 
 ### Required Secrets
 
@@ -149,7 +149,7 @@ Once ArgoCD is installed, it watches this repo. The `argo-apps/dev-apex-dev/` di
 
 When the CI pipeline commits a new image tag to a values file, ArgoCD picks it up and does a rolling deploy automatically. No manual `kubectl` or `helm upgrade` needed.
 
-All apps are configured with `selfHeal: true` and `prune: true` — if someone manually changes something in the cluster, ArgoCD will revert it back to what's in Git.
+All apps are configured with `selfHeal: true` and `prune: true` — if someone manually changes something in the cluster, ArgoCD will revert it.
 
 ---
 
