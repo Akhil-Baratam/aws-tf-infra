@@ -11,7 +11,7 @@ k8s_namespaces = ["dev", "ops"]
 
 # ─── AWS Load Balancer Controller ────────────────────────────────────────────
 enable_lb_controller            = true
-aws_lb_controller_chart_version = "1.13.4"
+aws_lb_controller_chart_version = "1.12.8"
 
 # ─── Cluster Autoscaler ─────────────────────────────────────────────────────
 enable_cluster_autoscaler            = true
