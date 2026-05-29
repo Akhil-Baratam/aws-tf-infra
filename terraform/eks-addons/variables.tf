@@ -26,6 +26,42 @@ variable "k8s_namespaces" {
 
 
 
+# ─── ArgoCD ──────────────────────────────────────────────────────────────────
+variable "enable_argo" {
+  type        = bool
+  default     = false
+  description = "enable_argo"
+}
+
+variable "argocd_version" {
+  type        = string
+  description = "argocd version"
+}
+
+variable "argo_root_app_repo_url" {
+  type        = string
+  default     = "default"
+  description = "argo_root_app_repo_url"
+}
+
+variable "argo_root_app_repo_revision" {
+  type        = string
+  default     = "main"
+  description = "argo_root_app_repo_revision"
+}
+
+variable "argo_apps_directory" {
+  type        = string
+  default     = ""
+  description = "argo_apps_directory"
+}
+
+variable "argo_repo_ssh_private_key" {
+  type        = string
+  default     = ""
+  sensitive   = true
+  description = "SSH private key for ArgoCD to access the Git repository"
+}
 
 # ─── AWS Load Balancer Controller ────────────────────────────────────────────
 
