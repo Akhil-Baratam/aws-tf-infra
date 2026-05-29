@@ -26,3 +26,17 @@ configs:
 
   credentialTemplates: {}
 
+server:
+  ingress:
+    enabled: true
+    controller: generic
+    annotations:
+      alb.ingress.kubernetes.io/group.name: dev-apex-dev-internet-facing
+      alb.ingress.kubernetes.io/healthcheck-path: /healthz
+      alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}]'
+      alb.ingress.kubernetes.io/scheme: internet-facing
+      alb.ingress.kubernetes.io/target-type: ip
+    ingressClassName: "alb"
+    hostname: ""
+    path: /
+    pathType: Prefix
